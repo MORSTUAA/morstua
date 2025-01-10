@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morstua - Let's Connect!</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .lightning-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .lightning {
+            position: absolute;
+            background: none;
+            opacity: 0;
+        }
+
+        .lightning svg {
+            width: 100%;
+            height: 100%;
+            stroke: rgba(255, 0, 0, 0.8);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            1% { opacity: 1; }
+            2% { opacity: 0; }
+            3% { opacity: 1; }
+            4% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            z-index: 1;
+        }
+
+        .greeting {
+            font-size: 3.5rem;
+            margin-bottom: 40px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #ff0000, #ff6b6b, #ff0000);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            animation: glowText 2s ease-in-out infinite;
+        }
+
+        @keyframes glowText {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.8)); }
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .btn {
+            text-decoration: none;
+            font-size: 1.5rem;
+            padding: 15px 40px;
+            border-radius: 50px;
+            background: linear-gradient(45deg, rgba(255, 0, 0, 0.8), rgba(255, 77, 77, 0.8));
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn i {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        @keyframes sparkle {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.5); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        .sparkle {
+            animation: sparkle 0.5s ease-out forwards;
+        }
+
+        .sparkle-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff0000;
+            animation: glow 2s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px #ff0000; }
+            50% { text-shadow: 0 0 20px #ff0000, 0 0 30px #ff0000; }
+        }
+
+        /* Floating shapes */
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(255, 0, 0, 0.2), rgba(255, 77, 77, 0.2));
+            border-radius: 50%;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            animation: morphShape 10s infinite alternate;
+        }
+
+        @keyframes morphShape {
+            0% { border-radius: 50%; }
+            25% { border-radius: 60% 40% 30% 70%; }
+            50% { border-radius: 30% 60% 70% 40%; }
+            75% { border-radius: 40% 30% 50% 60%; }
+            100% { border-radius: 50%; }
+        }
+
+        /* Button effects */
+        .btn-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.2), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .btn:hover .btn-glow {
+            opacity: 1;
+        }
+
+        .spark {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* YouTube Background */
+        #player-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #player {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="player-container">
+        <div id="player"></div>
+    </div>
+
+    <div class="lightning-container"></div>
+
+    <div class="floating-shapes"></div>
+
+    <div class="container">
+        <h1 class="greeting">ようこそ! (Welcome!)</h1>
+        <div class="buttons">
+            <a href="https://discord.com/users/morstua" target="_blank" class="btn discord">
+                <div class="btn-glow"></div>
+                <i class="fab fa-discord"></i> Discord: morstua
+            </a>
+            <a href="https://t.me/morsiiiiiik" target="_blank" class="btn">
+                <div class="btn-glow"></div>
+                <i class="fab fa-telegram"></i> Telegram
+            </a>
+            <a href="https://open.spotify.com/user/z6jl5vb2mjvimly34gk5ik0g3?si=6b44bb1bb0fb4ae2" target="_blank" class="btn">
+                <div class="btn-glow"></div>
+                <i class="fab fa-spotify"></i> Spotify
+            </a>
+            <a href="https://steamcommunity.com/id/morsssstua/" target="_blank" class="btn">
+                <div class="btn-glow"></div>
+                <i class="fab fa-steam"></i> Steam
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        Created by MORSTUA
+    </footer>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'BU2YSFnj47w',
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 0,
+                    'disablekb': 1,
+                    'enablejsapi': 1,
+                    'fs': 0,
+                    'iv_load_policy': 3,
+                    'loop': 1,
+                    'modestbranding': 1,
+                    'playsinline': 1,
+                    'rel': 0,
+                    'showinfo': 0,
+                    'mute': 0,
+                    'playlist': 'BU2YSFnj47w'
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.unMute();
+            event.target.setVolume(100);
+            event.target.playVideo();
+            updateVideoSize();
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                player.playVideo();
+            }
+            // Ensure video is playing and in high quality
+            if (event.data === YT.PlayerState.PLAYING) {
+                player.setPlaybackQuality('hd1080');
+            }
+        }
+
+        function updateVideoSize() {
+            if (!player || !player.getIframe) return;
+            
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const ratio = 16 / 9;
+            
+            let newWidth = width;
+            let newHeight = width / ratio;
+            
+            if (newHeight < height) {
+                newHeight = height;
+                newWidth = height * ratio;
+            }
+            
+            player.setSize(newWidth, newHeight);
+        }
+
+        window.addEventListener('resize', updateVideoSize);
+        document.addEventListener('DOMContentLoaded', updateVideoSize);
+
+        // Button sparkle effect
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Add sparkle effect to button
+                this.classList.add('sparkle');
+                
+                // Create sparkle particles
+                for (let i = 0; i < 15; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'sparkle-particle';
+                    
+                    const rect = this.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    
+                    document.body.appendChild(particle);
+                    
+                    const angle = (i / 15) * Math.PI * 2;
+                    const velocity = 5;
+                    const duration = 500 + Math.random() * 500;
+                    
+                    particle.animate([
+                        {
+                            transform: `translate(0, 0) scale(1)`,
+                            opacity: 1
+                        },
+                        {
+                            transform: `translate(${Math.cos(angle) * 50}px, ${Math.sin(angle) * 50}px) scale(0)`,
+                            opacity: 0
+                        }
+                    ], {
+                        duration: duration,
+                        easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+                    }).onfinish = () => particle.remove();
+                }
+                
+                // Remove sparkle class after animation
+                setTimeout(() => {
+                    this.classList.remove('sparkle');
+                    // Navigate to href after effect
+                    window.open(this.href, '_blank');
+                }, 500);
+            });
+        });
+
+        // Create floating shapes
+        function createFloatingShapes() {
+            const container = document.querySelector('.floating-shapes');
+            const numShapes = 15;
+
+            for (let i = 0; i < numShapes; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'shape';
+                
+                // Random size between 50px and 150px
+                const size = Math.random() * 100 + 50;
+                shape.style.width = size + 'px';
+                shape.style.height = size + 'px';
+                
+                // Random position
+                shape.style.left = Math.random() * 100 + '%';
+                shape.style.top = Math.random() * 100 + '%';
+                
+                // Random animation delay
+                shape.style.animationDelay = Math.random() * 5 + 's';
+                
+                // Add hover effect
+                shape.addEventListener('mouseover', () => {
+                    shape.style.transform = 'scale(1.5)';
+                    shape.style.opacity = '0';
+                    setTimeout(() => {
+                        shape.remove();
+                        createNewShape();
+                    }, 500);
+                });
+                
+                container.appendChild(shape);
+            }
+        }
+
+        function createNewShape() {
+            const container = document.querySelector('.floating-shapes');
+            const shape = document.createElement('div');
+            shape.className = 'shape';
+            
+            const size = Math.random() * 100 + 50;
+            shape.style.width = size + 'px';
+            shape.style.height = size + 'px';
+            
+            shape.style.left = Math.random() * 100 + '%';
+            shape.style.top = Math.random() * 100 + '%';
+            
+            shape.style.animationDelay = Math.random() * 5 + 's';
+            
+            shape.addEventListener('mouseover', () => {
+                shape.style.transform = 'scale(1.5)';
+                shape.style.opacity = '0';
+                setTimeout(() => {
+                    shape.remove();
+                    createNewShape();
+                }, 500);
+            });
+            
+            container.appendChild(shape);
+        }
+
+        // Create sparks around buttons
+        function createSpark(x, y) {
+            const spark = document.createElement('div');
+            spark.className = 'spark';
+            spark.style.left = x + 'px';
+            spark.style.top = y + 'px';
+            
+            document.body.appendChild(spark);
+            
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 2 + 1;
+            const lifetime = Math.random() * 500 + 500;
+            let opacity = 1;
+            
+            const animation = spark.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${Math.cos(angle) * 50}px, ${Math.sin(angle) * 50}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: lifetime,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+            });
+            
+            animation.onfinish = () => spark.remove();
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            createFloatingShapes();
+            
+            // Add spark effect to buttons
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('mousemove', (e) => {
+                    const rect = button.getBoundingClientRect();
+                    if (Math.random() > 0.8) {
+                        createSpark(e.clientX, e.clientY);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
